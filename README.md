@@ -1,5 +1,9 @@
 # mandoline-core
 
+Distributed, versioned, n-dimensional array database.
+
+[![Build Status](https://travis-ci.org/TheClimateCorporation/mandoline.svg?branch=master)](https://travis-ci.org/TheClimateCorporation/mandoline)
+
 What is Mandoline?
 ==================
 
