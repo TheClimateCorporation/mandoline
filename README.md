@@ -3,16 +3,27 @@
 What is Mandoline?
 ==================
 
-Mandoline is a library for reading and writing immutable, versioned
-datasets that contain multidimensional arrays. The Mandoline library
-can be extended to use different data store implementations. Currently
-supported data store implementations are
+Mandoline is a Clojure library for reading and writing immutable,
+versioned datasets that contain multidimensional arrays. The Mandoline
+library can be extended to use different data store
+implementations. Currently supported data store implementations are:
 
 - an in-memory local data store using Clojure atoms
-- a local filesystem store using the [SQLite](http://www.sqlite.org/)
-  transactional database library
-- a distributed data store using the AWS
-  [DynamoDB](http://aws.amazon.com/dynamodb/) service
+- a [local filesystem store](https://github.com/TheClimateCorporation/mandoline-sqlite)
+  using the [SQLite](http://www.sqlite.org/) transactional database library
+- a [distributed data store](https://github.com/TheClimateCorporation/mandoline-dynamodb)
+  using the AWS [DynamoDB](http://aws.amazon.com/dynamodb/) service (COMING SOON!)
+
+Usage
+=====
+
+If your project uses Leiningen, then it's as simple as sticking the
+following in your project.clj's :dependencies section:
+
+        [io.mandoline/mandoline-core "0.1.1"]
+
+Please note that this will only give you the in-memory store. For a
+persistent store, use one of the options listed above.
 
 Tutorial
 ========
@@ -20,7 +31,7 @@ Tutorial
 Overview
 --------
 
-This tutorial will walk you through
+This tutorial will walk you through:
 
 - The concept of *metadata* in Mandoline
 - The concept of a data *slab* in Mandoline
@@ -58,7 +69,7 @@ named *dimensions* (array axes). Each variable is a (possibly
 multi-dimensional) array of homogeneous type that is defined on zero or
 more dimensions. Multiple variables can share dimensions.
 
-To create a Mandoline dataset, you need to provide
+To create a Mandoline dataset, you need to provide:
 
 1. a *metadata map* that defines the structure of the dataset, and
 2. *slabs* that contain array values to populate the variables
