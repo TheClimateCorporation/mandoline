@@ -20,7 +20,7 @@ Usage
 If your project uses Leiningen, then it's as simple as sticking the
 following in your project.clj's :dependencies section:
 
-        [io.mandoline/mandoline-core "0.1.1"]
+[![Clojars Project](http://clojars.org/io.mandoline/mandoline-core/latest-version.svg)](http://clojars.org/io.mandoline/mandoline-core)
 
 Please note that this will only give you the in-memory store. For a
 persistent store, use one of the options listed above.
