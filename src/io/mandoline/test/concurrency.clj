@@ -200,7 +200,7 @@
           token (db/dataset-writer->token writer)
           proc (fn [& commands] (.start (ProcessBuilder. commands)))
           process-fn (fn [c]
-                       (proc "../../../tools/lein2"
+                       (proc "lein2"
                              ;; we need to make sure our logger doesn't talk to
                              ;; the output stream, because we are using it for
                              ;; IPC, but we still want logging
