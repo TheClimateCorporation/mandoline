@@ -12,7 +12,7 @@ implementations. Currently supported data store implementations are:
 - a [local filesystem store](https://github.com/TheClimateCorporation/mandoline-sqlite)
   using the [SQLite](http://www.sqlite.org/) transactional database library
 - a [distributed data store](https://github.com/TheClimateCorporation/mandoline-dynamodb)
-  using the AWS [DynamoDB](http://aws.amazon.com/dynamodb/) service (COMING SOON!)
+  using the AWS [DynamoDB](http://aws.amazon.com/dynamodb/) service
 
 Usage
 =====
