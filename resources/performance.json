@@ -1,0 +1,19 @@
+{
+  "dimensions": {
+    "x": 400,
+    "y": 600,
+    "z": 900
+  },
+  "variables": {
+    "foo": {
+      "type": "short",
+      "shape": ["x", "y", "z"],
+      "fill-value": -3
+      }
+  },
+  "chunk-dimensions": {
+    "x": 30,
+    "y": 30,
+    "z": 30
+  }
+}

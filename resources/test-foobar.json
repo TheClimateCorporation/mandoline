@@ -1,0 +1,39 @@
+{
+  "dimensions": {
+    "x": 10,
+    "y": 11,
+    "z": 12,
+    "time": 13
+  },
+  "variables": {
+    "foo": {
+      "type": "short",
+      "shape": ["x", "y", "time"],
+      "fill-value": -3
+      },
+    "bar": {
+      "type": "int",
+      "shape": ["x", "y", "z", "time"],
+      "fill-value": -99
+      },
+    "baz": {
+      "type": "char",
+      "shape": ["z"],
+      "fill-value": 0
+    },
+    "scalar": {
+      "attributes": {
+        "comments": "i am a scalar!"
+      },
+      "type": "int",
+      "shape": [],
+      "fill-value": 0
+      }
+    },
+  "chunk-dimensions": {
+    "x": 2,
+    "y": 2,
+    "z": 2,
+    "time": 2
+  }
+}
