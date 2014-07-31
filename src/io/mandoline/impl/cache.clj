@@ -78,7 +78,9 @@
   "Creates a least-used cache with a time-to-live policy.
 
    An LU cache was chosen because to aggressively minimize the amount
-   of I/O."
+   of I/O.
+
+  Chunks are only cached after a cache miss on read, not after writing."
   [cache-size]
   (c/lu-cache-factory {} :threshold cache-size))
 
@@ -88,22 +90,15 @@
   (read-chunk
     [_ hash]
     ;; implement read-through cache
-    (let [read-through #(if (c/has? % hash)
-                          (c/hit % hash)
-                          (if-let [bytes (proto/read-chunk next-store hash)]
-                            (c/miss % hash bytes)
-                            %))]
-      (-> (swap! chunk-cache read-through) (c/lookup hash))))
+    (if (c/has? @chunk-cache hash)
+        (swap! chunk-cache #(c/hit % hash))
+      (let [bytes (proto/read-chunk next-store hash)]
+        (swap! chunk-cache #(c/miss % hash bytes))))
+    (c/lookup @chunk-cache hash))
 
   (write-chunk
     [_ hash ref-count bytes]
-    (->>
-     #(if (c/has? % hash)
-        (c/hit % hash)
-        (do
-          (proto/write-chunk next-store hash ref-count (.slice ^ByteBuffer bytes))
-          (c/miss % hash bytes)))
-     (swap! chunk-cache)))
+    (proto/write-chunk next-store hash ref-count (.slice ^ByteBuffer bytes)))
 
   (update-chunk-refs
     [_ hash delta]
