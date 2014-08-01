@@ -569,3 +569,10 @@ Subsequent attempts to read from the dataset will trigger an exception:
           #_=>   (mandoline/variable-reader :time)
           #_=>   (mandoline/get-slice request-slice))
         ResourceNotFoundException Requested resource not found  com.amazonaws.http.AmazonHttpClient.handleErrorResponse (AmazonHttpClient.java:644)
+
+Credits
+-------
+Shoutouts to Brian Davis, Alice Liang, Steve Kim, and Sebastian Galkin for
+being major contributors to this project.  More shoutouts to Jeffrey
+Gerard, Tim Chagnon, Satshabad Khalsa, Daniel Richman, and Arthur Silva
+for contributing to Mandoline.
