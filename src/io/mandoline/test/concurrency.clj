@@ -178,8 +178,8 @@
 
   The rest of the inputs are fairly straight forward.
 
-  This test is only run for DynamoDB, and not run for the filesystem or memory
-  store because it doesn't make sense to need distributed writes for them."
+  This test is not run for the filesystem or memory backend stores
+  because it doesn't make sense to need distributed writes for them."
   [setup teardown mis-ordered?]
   (test-utils/with-temp-db store-spec setup teardown
     (let [nprocesses 4

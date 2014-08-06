@@ -18,7 +18,7 @@
    atomic operation. Returns true if new-hash was written")
 
   (flush-index [_]
-   "Write to peristent storage"))
+   "Write to persistent storage"))
 
 (defprotocol ChunkStore
   (read-chunk [_ hash]
@@ -93,8 +93,11 @@
    Extra custom keys can appear in the metadata")
 
   (versions [_ opts]
-   "Retrieve a (potentially lazy) seq of [<DateTime> <version-id> <metadata>] tuples
-   representing the available versions of the dataset. The collection is in
+   "Retrieve a (potentially lazy) seq of
+   {:timestamp <DateTime>
+    :version <version-id>
+    :metadata <metadata>]
+   maps representing the available versions of the dataset. The collection is in
    reverse chronological order. DateTime is the joda DateTime type and
    version-id are strings. If no versions exist for the dataset the operation
    returns an empty seq.  Metadata is the clojure map of the metadata"))

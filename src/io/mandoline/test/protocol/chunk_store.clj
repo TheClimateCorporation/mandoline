@@ -290,7 +290,7 @@
             chunk-store chunk-refs-to-update nonexistent-chunks)))
       (finally (teardown chunk-store)))))
 
-(defn- test-write-chunk-multi-threaded
+(defn test-write-chunk-multi-threaded
   [chunk-store chunks-to-write]
   (let [as (->> chunks-to-write ; (a b c ...)
              (map #(repeat 3 %)) ; ((a a a) (b b b) (c c c) ...)
@@ -315,7 +315,7 @@
       (is (= (proto/chunk-refs chunk-store hash) ref-count)
           "concurrent write-chunk calls are idempotent"))))
 
-(defn- test-update-chunk-refs-multi-threaded
+(defn test-update-chunk-refs-multi-threaded
   [chunk-store ref-count-updates]
   (let [expected-deltas (->> ref-count-updates
                           (group-by first)
