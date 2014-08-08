@@ -1,4 +1,4 @@
-(defproject io.mandoline/mandoline-core "0.1.3"
+(defproject io.mandoline/mandoline-core "0.1.4"
   :description
     "Mandoline is a distributed store for multi-dimensional arrays"
   :license {:name "Apache License, version 2.0"
