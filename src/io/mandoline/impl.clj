@@ -78,7 +78,8 @@
   {"file" "io.mandoline.backend.sqlite/mk-schema"
    "ddb" "io.mandoline.backend.dynamodb/mk-schema"
    "mem" "io.mandoline.backend.mem/mk-schema"
-   "s3" "io.mandoline.backend.s3/mk-schema"})
+   "s3" "io.mandoline.backend.s3/mk-schema"
+   "hybrid-s3-dynamodb" "io.mandoline.backend.hybrid-s3-dynamodb/mk-schema"})
 
 (defn- resolve-schema-alias
   "Returns a function var using the store alias. It expects store to be a var

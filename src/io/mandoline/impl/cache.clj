@@ -77,8 +77,8 @@
 (defn- mk-cache
   "Creates a least-used cache with a time-to-live policy.
 
-   An LU cache was chosen because to aggressively minimize the amount
-   of I/O.
+  An LU cache was chosen because to aggressively minimize the amount
+  of I/O.
 
   Chunks are only cached after a cache miss on read, not after writing."
   [cache-size]
@@ -91,7 +91,7 @@
     [_ hash]
     ;; implement read-through cache
     (if (c/has? @chunk-cache hash)
-        (swap! chunk-cache #(c/hit % hash))
+      (swap! chunk-cache #(c/hit % hash))
       (let [bytes (proto/read-chunk next-store hash)]
         (swap! chunk-cache #(c/miss % hash bytes))))
     (c/lookup @chunk-cache hash))
