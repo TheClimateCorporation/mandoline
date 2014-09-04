@@ -3,14 +3,15 @@
             [clojure.string :as string]
             [cheshire.core :as json]
             [cheshire.factory :as factory]
+            [com.climate.claypoole :as cp]
             [me.raynes.fs :as fs]
             [metrics.timers :refer (timer time!)])
   (:import [java.io IOException]
            [java.util.concurrent Executors Callable Future]
            [com.google.common.io Files]))
 
-(def ^:dynamic nthreads 24)
-(defonce mandoline-thread-pool (Executors/newFixedThreadPool nthreads))
+(def nthreads 24)
+(defonce mandoline-thread-pool (cp/threadpool nthreads))
 
 (defmacro instrument
   "Add a timer to the provided function. The timers are named thusly:
@@ -73,28 +74,9 @@
     (empty [_] (.empty s))
     (equiv [_ o] (.equiv s o))))
 
-(defn npmap
-  "Unlike pmap, we use an arbitrary number of threads (IO bounded) and a local
-  thread pool. The code is mostly copied from pmap"
-  ([f coll]
-  (npmap nthreads mandoline-thread-pool f coll))
-  ([n pool f coll]
-  (let [work (fn [elem]
-               (reify Callable
-                 (call [_]
-                   (try
-                     (f elem)
-                     (catch Exception e
-                       (log/error e "Error running npmap task")
-                       (throw e))))))
-        deref (fn [^Future f] (.get f))
-        rets (map #(.submit pool ^Callable (work %)) coll)
-        step (fn step [[x & xs :as vs] fs]
-               (lazy-seq
-                 (if-let [s (seq fs)]
-                   (cons (deref x) (step xs (rest s)))
-                   (map deref vs))))]
-    (step rets (drop n rets)))))
+(def npmap
+  "Unlike pmap, we use a local thread pool (IO bounded)."
+  (partial cp/pmap mandoline-thread-pool))
 
 (defprotocol VersionFilter
   (committed? [_ version-id]))
