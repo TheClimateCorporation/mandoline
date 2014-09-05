@@ -139,10 +139,7 @@
           writer (-> ds-writer db/on-last-version (db/add-version dds))
           _ (->> slabs
                  (partition 10)
-                 ;; FIX: We should be using utils/npmap, but it
-                 ;; doesn't compose well with the npmap calls lower in
-                 ;; this stack. For now, pmap works.
-                 (pmap
+                 (utils/npmap
                   #(with-open [f (db/variable-writer writer
                                                      :foo
                                                      {:wrappers []})]

@@ -33,6 +33,7 @@
      [org.clojure/math.numeric-tower "0.0.2"]
      [me.raynes/fs "1.4.3"]
      [com.google.guava/guava "15.0"]
+     [com.climate/claypoole "0.3"]
 
      ;; nrepl to launch a remote repl
      [org.clojure/tools.nrepl "0.2.3"]
