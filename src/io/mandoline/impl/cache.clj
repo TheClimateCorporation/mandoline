@@ -90,11 +90,12 @@
   (read-chunk
     [_ hash]
     ;; implement read-through cache
-    (if (c/has? @chunk-cache hash)
-      (swap! chunk-cache #(c/hit % hash))
-      (let [bytes (proto/read-chunk next-store hash)]
-        (swap! chunk-cache #(c/miss % hash bytes))))
-    (c/lookup @chunk-cache hash))
+    (let [delayed-read (delay (proto/read-chunk next-store hash))
+          updated-cache (swap! chunk-cache
+                               #(if (c/has? % hash)
+                                  (c/hit % hash)
+                                  (c/miss % hash @delayed-read)))]
+      (c/lookup updated-cache hash)))
 
   (write-chunk
     [_ hash ref-count bytes]
