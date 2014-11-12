@@ -574,5 +574,5 @@ Credits
 -------
 Shoutouts to Brian Davis, Alice Liang, Steve Kim, and Sebastian Galkin for
 being major contributors to this project.  More shoutouts to Jeffrey
-Gerard, Tim Chagnon, Satshabad Khalsa, Daniel Richman, and Arthur Silva
-for contributing to Mandoline.
+Gerard, Tim Chagnon, Satshabad Khalsa, Daniel Richman, Arthur Silva, and
+Leon Barrett for contributing to Mandoline.
