@@ -139,7 +139,7 @@
           writer (-> ds-writer db/on-last-version (db/add-version dds))
           _ (->> slabs
                  (partition 10)
-                 (utils/npmap
+                 (pmap
                   #(with-open [f (db/variable-writer writer
                                                      :foo
                                                      {:wrappers []})]
