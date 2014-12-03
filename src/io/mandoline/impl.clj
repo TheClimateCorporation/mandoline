@@ -220,7 +220,7 @@
         (blank-slab metadata var-name dtype chunk-slice)))))
 
 (defn- update-chunk!
-  [index parent-index version-id store coordinate slab written-already]
+  [index parent-index version-id store coordinate slab written-chunks]
   (loop [my-current-hash (chunk-at index coordinate version-id)]
     (let [bc (get-base-chunk my-current-hash index
                              parent-index store coordinate)
@@ -229,7 +229,7 @@
           ;; fixme implement ref-counting
           ref-count -1]
       ;; Write the chunk only if we need to (as far as we know).
-      (when-not (or (written-already hash)
+      (when-not (or (contains? @written-chunks hash)
                     (= hash my-current-hash))
         (->> slab
              :data
@@ -241,7 +241,8 @@
              ;; upstream.
              .rewind
              ;; write or re-write chunk (generating new chunk ID)
-             (proto/write-chunk store hash ref-count)))
+             (proto/write-chunk store hash ref-count))
+        (swap! written-chunks conj hash))
 
       (if (proto/write-index index coordinate my-current-hash hash)
         hash
@@ -268,11 +269,8 @@
         written-chunks (atom #{})
         update-fn (fn [slab coordinate]
                     (log/tracef "Updating chunk at %s" (pr-str coordinate))
-                    (let [written-chunk
-                          (update-chunk!
-                            index parent-index (:version-id metadata) store
-                            coordinate slab #(contains? @written-chunks %))]
-                      (swap! written-chunks conj written-chunk)))]
+                    (update-chunk! index parent-index (:version-id metadata)
+                                   store coordinate slab written-chunks))]
     (log/debugf "Writing to variable %s. Metadata: %s, parent %s"
                 var-name (pr-str metadata) (pr-str parent-metadata))
     (doseq [s slabs]
