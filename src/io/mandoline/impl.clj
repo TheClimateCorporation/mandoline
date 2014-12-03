@@ -220,7 +220,7 @@
         (blank-slab metadata var-name dtype chunk-slice)))))
 
 (defn- update-chunk!
-  [index parent-index version-id store coordinate slab]
+  [index parent-index version-id store coordinate slab written-already]
   (loop [my-current-hash (chunk-at index coordinate version-id)]
     (let [bc (get-base-chunk my-current-hash index
                              parent-index store coordinate)
@@ -228,21 +228,25 @@
           hash (chunk/generate-id slab)
           ;; fixme implement ref-counting
           ref-count -1]
-      (->> slab
-           :data
-           .getDataAsByteBuffer
-           ;; TODO: The following line fixes a bug in ArrayChar, where
-           ;; .getDataAsByteBuffer doesn't rewind its position index. We
-           ;; should make sure that this doesn't accidentally rewind
-           ;; past the start of a chunk. We should also fix this
-           ;; upstream.
-           .rewind
-           ;; write or re-write chunk (generating new chunk ID)
-           (proto/write-chunk store hash ref-count))
+      ;; Write the chunk only if we need to (as far as we know).
+      (when-not (or (written-already hash)
+                    (= hash my-current-hash))
+        (->> slab
+             :data
+             .getDataAsByteBuffer
+             ;; TODO: The following line fixes a bug in ArrayChar, where
+             ;; .getDataAsByteBuffer doesn't rewind its position index. We
+             ;; should make sure that this doesn't accidentally rewind
+             ;; past the start of a chunk. We should also fix this
+             ;; upstream.
+             .rewind
+             ;; write or re-write chunk (generating new chunk ID)
+             (proto/write-chunk store hash ref-count)))
 
-      ;; If write-index returned nil, the transaction was aborted
-      ;; because another writer slipped in ahead of us. Re-merge this chunk.
-      (when-not (proto/write-index index coordinate my-current-hash hash)
+      (if (proto/write-index index coordinate my-current-hash hash)
+        hash
+        ;; If write-index returned nil, the transaction was aborted
+        ;; because another writer slipped in ahead of us. Re-merge this chunk.
         (let [sha1 (chunk-at index coordinate version-id)]
           (log/tracef (str "Retrying chunk update transaction at coordinate %s, "
                            "new sha1 %s") (pr-str coordinate) sha1)
@@ -261,10 +265,14 @@
   (let [{:keys [metadata var-name]} (proto/target index)
         {parent-metadata :metadata} (when parent-index
                                       (proto/target parent-index))
+        written-chunks (atom #{})
         update-fn (fn [slab coordinate]
                     (log/tracef "Updating chunk at %s" (pr-str coordinate))
-                    (update-chunk! index parent-index (:version-id metadata)
-                                   store coordinate slab))]
+                    (let [written-chunk
+                          (update-chunk!
+                            index parent-index (:version-id metadata) store
+                            coordinate slab #(contains? @written-chunks %))]
+                      (swap! written-chunks conj written-chunk)))]
     (log/debugf "Writing to variable %s. Metadata: %s, parent %s"
                 var-name (pr-str metadata) (pr-str parent-metadata))
     (doseq [s slabs]
