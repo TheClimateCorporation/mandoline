@@ -10,8 +10,7 @@
            [java.util.concurrent Executors Callable Future]
            [com.google.common.io Files]))
 
-(def nthreads 24)
-(defonce mandoline-thread-pool (cp/threadpool nthreads))
+(defonce mandoline-thread-pool (cp/threadpool (* 50 (cp/ncpus))))
 
 (defmacro instrument
   "Add a timer to the provided function. The timers are named thusly:
