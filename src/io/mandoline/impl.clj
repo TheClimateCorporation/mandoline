@@ -182,11 +182,24 @@
            :index
            (wrappers-fun (proto/index connection var-name mdata options) res))))
 
-(defn- ^ucar.ma2.Array bytes-to-array
+(defn ^ucar.ma2.Array bytes-to-array
   "Coerces a byte-buffer to a new Array with given data type and shape."
   [^ByteBuffer byte-buffer ^DataType dtype shape]
-  ;; todo do we have unnecessary copying here?
-  (Array/factory dtype (int-array shape) byte-buffer))
+  (locking byte-buffer
+    (let [p (.position byte-buffer)
+          r (.remaining byte-buffer)
+          ; If the ByteBuffer is not perfectly aligned with its
+          ; underlying byte[] storage, make a copy
+          bb (if-not (and (= 0 (.arrayOffset byte-buffer) p)
+                          (= (alength (.array byte-buffer)) r))
+               (let [dst (byte-array r)]
+                 (.get byte-buffer dst)
+                 (ByteBuffer/wrap dst))
+               byte-buffer)
+          array (Array/factory dtype (int-array shape) bb)]
+      ; Resume original position
+      (.position byte-buffer p)
+      array)))
 
 (defn hash->slab [hash chunk-store dtype slice]
   (assert hash)
