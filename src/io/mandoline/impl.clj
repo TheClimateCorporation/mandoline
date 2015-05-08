@@ -189,7 +189,13 @@
     (let [p (.position byte-buffer)
           r (.remaining byte-buffer)
           ; If the ByteBuffer is not perfectly aligned with its
-          ; underlying byte[] storage, make a copy
+          ; underlying byte[] storage, make a copy. This copy defends
+          ; against a bug in the ucar.ma2.Array/factory method, which
+          ; does not honor the position and limit of the ByteBuffer and
+          ; reads out-of-range bytes in the underlying byte[] when the
+          ; data type is DataType/BYTE.
+          ; TODO: Fix the bug in upstream ucar netCDF library so that we
+          ; don't need this copy overhead.
           bb (if-not (and (= 0 (.arrayOffset byte-buffer) p)
                           (= (alength (.array byte-buffer)) r))
                (let [dst (byte-array r)]
