@@ -197,7 +197,7 @@
           ; TODO: Fix the bug in upstream ucar netCDF library so that we
           ; don't need this copy overhead.
           bb (if-not (and (= 0 (.arrayOffset byte-buffer) p)
-                          (= (alength (.array byte-buffer)) r))
+                          (= (.capacity byte-buffer) (.limit byte-buffer) r))
                (let [dst (byte-array r)]
                  (.get byte-buffer dst)
                  (ByteBuffer/wrap dst))

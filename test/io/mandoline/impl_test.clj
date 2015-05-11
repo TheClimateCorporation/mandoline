@@ -65,6 +65,6 @@
     (is (= (take (- 19 3) (drop (+ 4 3) elements)) (seq (.copyTo1DJavaArray array)))
         "bytes-to-array returns an Array that contains the expected elements")
     (is (= 3 (.position byte-buffer))
-        "bytes-to-array returns the ByteBuffer with its original position")
+        "bytes-to-array does not change the position of the original ByteBuffer")
     (is (= 19 (.limit byte-buffer))
-        "bytes-to-array returns the ByteBuffer with its original limit")))
+        "bytes-to-array does not change the limit of the original ByteBuffer")))
