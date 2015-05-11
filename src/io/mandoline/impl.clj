@@ -182,11 +182,30 @@
            :index
            (wrappers-fun (proto/index connection var-name mdata options) res))))
 
-(defn- ^ucar.ma2.Array bytes-to-array
+(defn ^ucar.ma2.Array bytes-to-array
   "Coerces a byte-buffer to a new Array with given data type and shape."
   [^ByteBuffer byte-buffer ^DataType dtype shape]
-  ;; todo do we have unnecessary copying here?
-  (Array/factory dtype (int-array shape) byte-buffer))
+  (locking byte-buffer
+    (let [p (.position byte-buffer)
+          r (.remaining byte-buffer)
+          ; If the ByteBuffer is not perfectly aligned with its
+          ; underlying byte[] storage, make a copy. This copy defends
+          ; against a bug in the ucar.ma2.Array/factory method, which
+          ; does not honor the position and limit of the ByteBuffer and
+          ; reads out-of-range bytes in the underlying byte[] when the
+          ; data type is DataType/BYTE.
+          ; TODO: Fix the bug in upstream ucar netCDF library so that we
+          ; don't need this copy overhead.
+          bb (if-not (and (= 0 (.arrayOffset byte-buffer) p)
+                          (= (.capacity byte-buffer) (.limit byte-buffer) r))
+               (let [dst (byte-array r)]
+                 (.get byte-buffer dst)
+                 (ByteBuffer/wrap dst))
+               byte-buffer)
+          array (Array/factory dtype (int-array shape) bb)]
+      ; Resume original position
+      (.position byte-buffer p)
+      array)))
 
 (defn hash->slab [hash chunk-store dtype slice]
   (assert hash)
