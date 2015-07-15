@@ -15,14 +15,14 @@
   (let [foo-time "io.mandoline.utils-test.foo.time"
         baz-time "io.mandoline.utils-test.baz.time"
         _ (utils/instrument [foo baz])]
-    (is (= 0 (.count ((all-metrics) foo-time))))
-    (is (= 0 (.count ((all-metrics) baz-time))))
+    (is (= 0 (.getCount ((all-metrics) foo-time))))
+    (is (= 0 (.getCount ((all-metrics) baz-time))))
     (is (foo 3 4))
-    (is (= 1 (.count ((all-metrics) foo-time))))
+    (is (= 1 (.getCount ((all-metrics) foo-time))))
     (is (bar 3 4))
-    (is (= 2 (.count ((all-metrics) foo-time))))
+    (is (= 2 (.getCount ((all-metrics) foo-time))))
     (is (baz 3 4))
-    (is (= 1 (.count ((all-metrics) baz-time))))))
+    (is (= 1 (.getCount ((all-metrics) baz-time))))))
 
 (deftest test-mk-temp-dir
   (testing "mk-temp-dir"
