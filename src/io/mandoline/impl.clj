@@ -186,7 +186,10 @@
   "Coerces a byte-buffer to a new Array with given data type and shape."
   [^ByteBuffer byte-buffer ^DataType dtype shape]
   (locking byte-buffer
-    (let [p (.position byte-buffer)
+    (let [_ (when (nil? byte-buffer)
+              (throw (IllegalArgumentException.
+                       "Can't construct byte-buffer from null.")))
+          p (.position byte-buffer)
           r (.remaining byte-buffer)
           ; If the ByteBuffer is not perfectly aligned with its
           ; underlying byte[] storage, make a copy. This copy defends
@@ -201,10 +204,7 @@
                (let [dst (byte-array r)]
                  (.get byte-buffer dst)
                  (ByteBuffer/wrap dst))
-               (if (nil? byte-buffer)
-                 (throw (IllegalArgumentException.
-                          "Can't construct byte-buffer from null"))
-                 byte-buffer))
+               byte-buffer)
           array (Array/factory dtype (int-array shape) bb)]
       ; Resume original position
       (.position byte-buffer p)
