@@ -67,4 +67,6 @@
     (is (= 3 (.position byte-buffer))
         "bytes-to-array does not change the position of the original ByteBuffer")
     (is (= 19 (.limit byte-buffer))
-        "bytes-to-array does not change the limit of the original ByteBuffer")))
+        "bytes-to-array does not change the limit of the original ByteBuffer")
+    (is (thrown? IllegalArgumentException (impl/bytes-to-array nil data-type shape))
+        "bytes-to-array throws an IllegalArgumentException when passed null reference")))
