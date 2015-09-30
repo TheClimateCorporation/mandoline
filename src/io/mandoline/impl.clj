@@ -201,7 +201,10 @@
                (let [dst (byte-array r)]
                  (.get byte-buffer dst)
                  (ByteBuffer/wrap dst))
-               byte-buffer)
+               (if (nil? byte-buffer)
+                 (throw (IllegalArgumentException.
+                          "Can't construct byte-buffer from null"))
+                 byte-buffer))
           array (Array/factory dtype (int-array shape) bb)]
       ; Resume original position
       (.position byte-buffer p)
