@@ -185,6 +185,9 @@
 (defn ^ucar.ma2.Array bytes-to-array
   "Coerces a byte-buffer to a new Array with given data type and shape."
   [^ByteBuffer byte-buffer ^DataType dtype shape]
+  (when (nil? byte-buffer)
+    (throw (IllegalArgumentException.
+             "Can't construct byte-buffer from null.")))
   (locking byte-buffer
     (let [p (.position byte-buffer)
           r (.remaining byte-buffer)
