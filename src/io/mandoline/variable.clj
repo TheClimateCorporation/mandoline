@@ -3,6 +3,7 @@
    [io.mandoline.chunk :as chunk]
    [io.mandoline.slab :as slab]
    [io.mandoline.slice :as slice])
+  (:refer-clojure :exclude [update])
   (:import
    [ucar.ma2 DataType Array]
    [io.mandoline.slice Slice]))
