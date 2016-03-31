@@ -82,7 +82,7 @@
 
   Chunks are only cached after a cache miss on read, not after writing."
   [cache-size]
-  (c/lu-cache-factory {} :threshold cache-size))
+  (c/lru-cache-factory {} :threshold cache-size))
 
 (deftype CachingChunkStore [next-store chunk-cache cache-size]
   proto/ChunkStore
