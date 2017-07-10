@@ -20,14 +20,6 @@
   (:import
    [java.nio ByteBuffer]))
 
-;; NOTE: ONLY USE CachingIndex FOR WRITING!
-;;
-;; In order to optimize for write performance, this index store does
-;; *not* implement a read-through cache. If you attempt to use this
-;; store for reading, you will get what appears to be a completely
-;; empty index.
-;;
-;;
 ;; NOTE: CACHING FOR DISTRIBUTED WRITERS IS NOT SUPPORTED!
 ;;
 ;; This implementation of flush-index assumes that there is only one
@@ -43,13 +35,21 @@
 
   (chunk-at
     [_ coordinates]
-    (get @index-cache coordinates))
+    (let [delayed-read (delay (proto/chunk-at next-store coordinates))
+          updated-cache (swap! index-cache
+                               #(if (c/has? % coordinates)
+                                  (c/hit % coordinates)
+                                  (c/miss % coordinates @delayed-read)))]
+      (c/lookup updated-cache coordinates)))
 
   (chunk-at
     [_ coordinates version-id]
-    ;; CachingIndex only works during writes, so it only caches a single
-    ;; version-id
-    (get @index-cache coordinates))
+    (let [delayed-read (delay (proto/chunk-at next-store coordinates version-id))
+          updated-cache (swap! index-cache
+                               #(if (c/has? % coordinates)
+                                  (c/hit % coordinates)
+                                  (c/miss % coordinates @delayed-read)))]
+      (c/lookup updated-cache coordinates)))
 
   (write-index
     [_ coordinates old-hash new-hash]
@@ -112,10 +112,8 @@
      (atom (mk-cache cache-size))
      cache-size)))
 
-;; FIX: For now, make the size of the index be the full size
-;; (memory-resident). Items are NOT evictable from the cache, except
-;; via flushing.
 (defn mk-caching-index [next-store options]
-  (->CachingIndex
-   (atom {})
-   next-store))
+  (let [{:keys [cache-size] :or {cache-size 1000}} options]
+    (->CachingIndex
+      (atom (mk-cache cache-size))
+     next-store)))
