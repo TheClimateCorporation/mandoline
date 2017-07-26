@@ -132,8 +132,10 @@
   (if use-cache?
     [compressed-store/mk-compressed-store cache/mk-caching-chunk-store]
     [compressed-store/mk-compressed-store]))
-(def default-index-reader-wrappers
-  (constantly []))
+(defn default-index-reader-wrappers [& _]
+  (if use-cache?
+    [cache/mk-caching-index]
+    []))
 (defn default-store-writer-wrappers [& _]
   (if use-cache?
     [compressed-store/mk-compressed-store cache/mk-caching-chunk-store]
